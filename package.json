@@ -1,0 +1,17 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "a REST API to manage expense",
+  "license": "ISC",
+  "author": "Rishank Kumar",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "mysql": "^2.18.1"
+  }
+}
