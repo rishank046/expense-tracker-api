@@ -7,85 +7,91 @@ import url from 'node:url';
 import createUser from './controllers/createUser.js';
 import { create } from 'node:domain';
 import addExpense from './controllers/addExpense.js';
+import logInUser from './controllers/logInUser.js';
+import getUserIdByToken from './controllers/getIdByToken.js';
+
 
 const server = http.createServer(async function(req , res){
     res.setHeader('Access-Control-Allow-Origin' , 'http://localhost:3000');
     const reqUrl = new URL(req.url , `http://${req.headers.host}`);
-
+    
     try{
-    if(req.method === 'OPTIONS'){
-        res.writeHead(200 , {
-            'Content-Type' : 'text/plain',
-            'Timeout' : '10',
-            'cache-control' : 'no-cache'
-        })
-        res.end('This data is not for user')
-        return;
-    }
-
-    else if(req.method === 'POST' && reqUrl.pathname === '/signUp'){
-        res.statusCode = 201;
-        try{
-            await createUser(reqUrl.searchParams.get('username') , reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'))
-            res.end('User Created');
-            return;
-        } catch(error){
-            res.end('Cannot able to create user');
+        if(req.method === 'OPTIONS'){
+            res.writeHead(200 , {
+                'Content-Type' : 'text/plain',
+                'Timeout' : '10',
+                'cache-control' : 'no-cache'
+            })
+            res.end('This data is not for user')
             return;
         }
-    }
 
-    else if(req.method === 'GET' && reqUrl.pathname === '/getExpense'){
-        try{
-            const expenceData = await getExpense(reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'));
-            if(expenceData.length === 0){
+        else if(req.method === 'POST' && reqUrl.pathname === '/signIn'){
+            const [token] = await logInUser(reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'));
+            if(token[0].length === 0){
                 res.statusCode = 404;
-                res.end();
+                res.end('user not found');
+                return;
+            }
+            res.setHeader('Set-Cookie' , `session_id=${token}; Path=/; httpOnly`)
+            res.end();
+            return;
+        }
+
+        else if(req.method === 'POST' && reqUrl.pathname === '/signUp'){
+            res.statusCode = 201;
+            try{
+                await createUser(reqUrl.searchParams.get('username') , reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'))
+                res.end('User Created');
+                return;
+            } catch(error){
+                res.end('Cannot able to create user');
+                return;
+            }
+        }
+
+        else if(req.method === 'POST' && reqUrl.pathname === '/addExpense'){
+            const userId= await getUserIdByToken(req.headers.cookie);
+            if(userId === undefined){
+                res.statusCode = 404;
+                res.end('user have to login first');
+                return;
+            }
+           const result = await addExpense(userId[0].usr_id , reqUrl.searchParams.get('amnt') , reqUrl.searchParams.get('dscr'));
+            if(result !== null){
+                res.end('Added expense');
                 return;
             }
             else{
-                res.end(JSON.stringify(expenceData));
+                res.end('Failed to add expense');
                 return;
             }
-        } catch (error){
-            res.end(`Cannot get expense ${error}`);
-            return;
         }
-    }
-
-    else if(req.method === 'POST' && reqUrl.pathname === '/addExpense'){
-        const result = await addExpense(reqUrl.searchParams.get('userId') , reqUrl.searchParams.get('amnt') , reqUrl.searchParams.get('dscr'));
-        if(result === 0){
-            res.end('Added expense');
-            return;
-        }
-        else{
-            res.end('Failed to add expense');
-            return;
-        }
-    }
     
-    else if(req.method === 'GET' && reqUrl.pathname === '/getExpense'){
-        const result = await getExpense(reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'));
-        if(result === 1){
-            res.end('cannot fetch data');
-            return;
+        else if(req.method === 'GET' && reqUrl.pathname === '/getExpense'){
+            let userId = await getUserIdByToken(req.headers.cookie);
+            const result = await getExpense(userId);
+            console.log(result)
+            if(result === 1){
+                res.end('cannot fetch data');
+                return;
+            }
+            else{
+                res.end(result.toString());
+                return;
+            }
         }
-        else{
-            res.end(result);
-            return;
-        }
-    }
 
-    else{
-        res.end('invalid request');
-        return;
-    }
+        else{
+            res.end('invalid request');
+            return;
+        }
 
     }
     catch(err){
         res.statusCode = 500;
-        res.end()
+        res.end(JSON.stringify(err));
+        console.log(err)
         return;
     }
 })
@@ -93,5 +99,5 @@ const server = http.createServer(async function(req , res){
 initDB().then(() => {
     server.listen(3000 , async function(){
         console.log("Server is working and running")
-    });
-})
+    })
+});

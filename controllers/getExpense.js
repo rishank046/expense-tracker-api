@@ -1,11 +1,10 @@
 import db from '../db/database.js';
 import 'dotenv/config';
 
-const addExp = async (email , password) => {
+const getExpense = async (userId) => {
     try{
-        const [user] = await db.query(`SELECT * FROM ${process.env.USER_TABLE_NAME} WHERE usr_email = ? AND usr_pswd = ?`,[email,password]);
-            const userId = user[0].usr_id;
-            const [expenses] = await db.query(`SELECT * FROM ${process.env.EXPENSE_TABLE_NAME} WHERE usr_id = ?` , userId);
+            const [expenses] = await db.query(`SELECT * FROM ${process.env.EXPENSE_TABLE_NAME} WHERE usr_id = ?` , [userId]);
+            console.log(expenses)
             return expenses;
     }catch (error) {
         console.log(`cannot able to fetch expense data ${error}`);
@@ -13,4 +12,4 @@ const addExp = async (email , password) => {
     }
 }
 
-export default addExp;
+export default getExpense;

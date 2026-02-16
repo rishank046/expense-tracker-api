@@ -5,7 +5,7 @@ const setExp = async (userId , amount , description) => {
     try{
        await db.query(`INSERT INTO ${process.env.EXPENSE_TABLE_NAME} (amnt , dscr , usr_id) VALUES (?, ?, ?)` , [amount , description , userId]) 
         return 0; 
-    } catch {
+    } catch (error){
         return 1;
     }
 }
