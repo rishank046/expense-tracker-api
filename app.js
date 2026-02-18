@@ -27,8 +27,8 @@ const server = http.createServer(async function(req , res){
         }
 
         else if(req.method === 'POST' && reqUrl.pathname === '/signIn'){
-            const [token] = await logInUser(reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'));
-            if(token[0].length === 0){
+            const token= await logInUser(reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'));
+            if(token === null){
                 res.statusCode = 404;
                 res.end('user not found');
                 return;
@@ -38,7 +38,7 @@ const server = http.createServer(async function(req , res){
             return;
         }
 
-        else if(req.method === 'POST' && reqUrl.pathname === '/signUp'){
+        else if(req.method === 'POST' && reqUrl.pathname === '/register'){
             res.statusCode = 201;
             try{
                 await createUser(reqUrl.searchParams.get('username') , reqUrl.searchParams.get('email') , reqUrl.searchParams.get('password'))
@@ -57,7 +57,7 @@ const server = http.createServer(async function(req , res){
                 res.end('user have to login first');
                 return;
             }
-           const result = await addExpense(userId[0].usr_id , reqUrl.searchParams.get('amnt') , reqUrl.searchParams.get('dscr'));
+           const result = await addExpense(userId , reqUrl.searchParams.get('amnt') , reqUrl.searchParams.get('dscr'));
             if(result !== null){
                 res.end('Added expense');
                 return;
@@ -70,8 +70,8 @@ const server = http.createServer(async function(req , res){
     
         else if(req.method === 'GET' && reqUrl.pathname === '/getExpense'){
             let userId = await getUserIdByToken(req.headers.cookie);
-            const result = await getExpense(userId[0].usr_id);
-            if(result[0].length === 1){
+            const result = await getExpense(userId);
+            if(!result){
                 res.end('cannot fetch data');
                 return;
             }

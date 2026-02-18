@@ -9,8 +9,8 @@ async function logIn(userEmail , userPassword){
     const [user] = await db.query(`
         SELECT * FROM ${process.env.USER_TABLE_NAME} WHERE usr_email = ? AND usr_pswd = ?` , [userEmail , userPassword]);
     
-    if(user.length == 0){
-       return []; 
+    if(user.length === 0){
+       return null; 
     }
     else{
         const userId = user[0].usr_id;

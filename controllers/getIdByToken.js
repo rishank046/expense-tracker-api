@@ -2,7 +2,7 @@ import database from '../db/database.js';
 import 'dotenv/config';
 
 async function getUserIdByToken(realCookie){
-    let userId; 
+
     const session_id = realCookie
         .split('; ')
         .filter(function (element){
@@ -13,12 +13,15 @@ async function getUserIdByToken(realCookie){
             else return false;
         })[0]
         ?.split('=')[1];
+
+    if(!session_id) return null;
     // find userId after verifying the token session_id
-    [userId] = await database.query(`
+
+    const [userId] = await database.query(`
         SELECT * FROM ${process.env.TOKEN_TABLE_NAME} WHERE TOKEN=?
     `,[session_id]) 
-    console.log(userId[0].usr_id)
-    return userId;
+
+    return userId[0].usr_id;
 }
 
 export default getUserIdByToken;
