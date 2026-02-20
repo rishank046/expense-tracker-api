@@ -70,6 +70,7 @@ const server = http.createServer(async function(req , res){
     
         else if(req.method === 'GET' && reqUrl.pathname === '/getExpense'){
             let userId = await getUserIdByToken(req.headers.cookie);
+            console.log(userId)
             const result = await getExpense(userId);
             if(!result){
                 res.end('cannot fetch data');
@@ -77,6 +78,16 @@ const server = http.createServer(async function(req , res){
             }
             else{
                 res.end(result.toString());
+                return;
+            }
+        }
+
+        else if(req.method === 'GET' && reqUrl.pathname === '/filterExpense'){
+            let userId = await getUserIdByToken(req.headers.cookie);
+            const expenses = await filterExpenseByAmount(userId , reqUrl.searchParams.get('amount'));
+
+            if(!expenses){
+                res.end(expenses);
                 return;
             }
         }

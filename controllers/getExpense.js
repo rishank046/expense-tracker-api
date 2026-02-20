@@ -9,6 +9,8 @@ const getExpense = async (userId) => {
             return `${obj.amnt} -> ${obj.dscr}`;
         }).join(' | ');
 
+        console.log(expenses)
+        console.log(userId)
         return expString;
     }catch (error) {
         console.log(`cannot able to fetch expense data ${error}`);

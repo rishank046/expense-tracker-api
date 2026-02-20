@@ -13,6 +13,7 @@ const getFilteredData = async (userId , amount) => {
             }
         })
         
+        console.log(filteredResponse)
         return filteredResponse;
     }
     catch (error){
