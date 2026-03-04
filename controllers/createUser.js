@@ -1,20 +1,17 @@
-import db from '../db/database.js';
+import wrapper from '../utils/catchWrapper.js';
+import parseBody from '../utils/parseBody.js';
 
-const createUsr = async (userName , email , password) => {
-    try{
-        const [userRow] = await db.query(`SELECT * FROM ${process.env.USER_TABLE_NAME} WHERE usr_email = ?`  , [email])
-    
-        if(userRow.length === 0){
-            await db.query(`INSERT INTO ${process.env.USER_TABLE_NAME} (usr_nm , usr_email , usr_pswd) VALUES (?, ?, ?)` , [userName , email , password]);
-            return 0;
-        }
-        else{
-            return 1;
-        }
-    }
-    catch (error){
-        console.log(`Failed to create user ${error}`);
-    }
-}
+export default wrapper( async (req , res) => {
+   const {userName , email , password} = await parseBody(req);
+   const [userRow] = await db.query(`SELECT 1 FROM ${process.env.USER_TABLE_NAME} WHERE usr_email = ?`  , [email])
 
-export default createUsr;
+   if(userRow.length === 0){
+        await db.query(`INSERT INTO ${process.env.USER_TABLE_NAME} (usr_nm , usr_email , usr_pswd) VALUES (?, ?, ?)` , [userName , email , password]);
+        res.statusCode = 201;
+        res.end();
+    }
+    else{
+        res.statusCode = 409;
+        res.end();
+    }
+})

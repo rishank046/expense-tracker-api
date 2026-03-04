@@ -1,8 +1,11 @@
 import db from '../db/database.js';
 import crypto from 'node:crypto';
-import 'dotenv/config';
+import wrapper from '../utils/catchWrapper.js';
+import parseBody from '../utils/parseBody.js';
 
-async function logIn(userEmail , userPassword){
+export default wrapper(async (req , res) => {
+    const {userEmail , userPassword} = await parseBody();
+
     const createLoginToken = `
         INSERT INTO ${process.env.TOKEN_TABLE_NAME} (token , usr_id) VALUES (? , ?) 
     `
@@ -27,6 +30,4 @@ async function logIn(userEmail , userPassword){
             return userToken[0].token;
         }
     }
-}
-
-export default logIn; 
+})

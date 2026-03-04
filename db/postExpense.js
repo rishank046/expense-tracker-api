@@ -1,7 +1,6 @@
 import db from './database.js';
 
-const postData = async (amount , description , userId) => {
-    const putData = `
-    
-    `
+export default async (amount , description , userId) => {
+    await db.query(`INSERT INTO ${process.env.EXPENSE_TABLE_NAME} (amnt , dscr , usr_id) VALUES (?, ?, ?)` , [amount , description , userId]) 
+ 
 }

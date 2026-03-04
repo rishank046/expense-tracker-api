@@ -1,21 +1,24 @@
-import db from '../db/database.js';
-import 'dotenv/config';
+import wrapper from '../utils/catchWrapper.js';
+import getExpService from '../db/getExpense.service.js';
+import parseBody from '../utils/parseBody.js';
 
-const getExpense = async (userId) => {
-    try{
-        const [expenses] = await db.query(`SELECT * FROM ${process.env.EXPENSE_TABLE_NAME} WHERE usr_id = ?` , [userId]);
-
-        let expString = expenses.map(obj => {
-            return `${obj.amnt} -> ${obj.dscr}`;
-        }).join(' | ');
-
-        console.log(expenses)
-        console.log(userId)
-        return expString;
-    }catch (error) {
-        console.log(`cannot able to fetch expense data ${error}`);
-        return null;
+export default wrapper(async (req , res) => {
+    const body = await parseBody(req);
+    
+    if(!body || !body.userId){
+        res.writeHead(404 , 'user not found');
+        res.end();
+        return;
     }
-}
 
-export default getExpense;
+    let expString = await getExpService(body.userId); 
+
+    if(!expString || expString.length == 0){
+        res.statusCode = 404;
+        res.end('expense not found');
+        return;
+    }
+
+    res.statusCode = 200;
+    res.end(JSON.stringify(expString));
+})
