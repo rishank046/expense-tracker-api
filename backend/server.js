@@ -11,7 +11,7 @@ const server = http.createServer(async function(req , res){
 })
 
 initDB().then(() => {
-    server.listen(3000 , async function(){
+    server.listen(3000 ,'::', function(){
         console.log("Server is working and running")
     })
 });

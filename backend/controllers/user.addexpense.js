@@ -1,7 +1,7 @@
-import createExpense from '../db/postExpense.js';
+import createExpense from '../services/addexpense.service.js';
 import catchWrapper from '../utils/catchWrapper.js';
 import parseBody from '../utils/parseBody.js';
-import getIdByToken from '../controllers/getIdByToken.js';
+import getIdByToken from '../controllers/user.idbytoken.js';
 
 export default catchWrapper(async (req , res) => {
     const data = await parseBody(req);

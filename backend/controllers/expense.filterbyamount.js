@@ -1,8 +1,9 @@
-import db from '../db/database.js';
-import 'dotenv/config'
+import db from '../db/database.connect.js';
+import wrapper from '../utils/catchWrapper.js';
+import parseBody from '../utils/parseBody.js';
 
-export default async (userId , amount) => {
-    try{
+export default wrapper(async (req , res) => {
+    const {userId , amount} = await parseBody(req);
         const [response] = await db.query(`SELECT * FROM ${process.env.EXPENSE_TABLE_NAME} WHERE usr_id = ?` , userId);
         const filteredResponse = response.filter((exp) => {
             if(exp.amount === amount){
@@ -13,10 +14,6 @@ export default async (userId , amount) => {
             }
         })
         
-        console.log(filteredResponse)
-        return filteredResponse;
-    }
-    catch (error){
-        return error;
-    }
-}
+    res.statusCode = 200;
+    res.end(JSON.stringify(filteredResponse));
+})

@@ -1,9 +1,8 @@
-import addExpense from '../controllers/addExpense.js';
-import getExpense from '../controllers/getExpense.js';
-import filterExpenseByAmount from '../controllers/filterExpenseByamount.js';
-import signIn from '../controllers/logInUser.js';
-import register from '../controllers/createUser.js';
-import route from './routes.js';
+import addExpense from '../controllers/user.addexpense.js';
+import getExpense from '../controllers/user.getexpense.js';
+import filterExpenseByAmount from '../controllers/expense.filterbyamount.js';
+import signIn from '../controllers/user.login.js';
+import register from '../controllers/user.signin.js';
 
 const routesObj = {
     'GET' : {

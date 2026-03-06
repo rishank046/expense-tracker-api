@@ -1,4 +1,4 @@
-import database from '../db/database.js';
+import database from '../db/database.connect.js';
 import 'dotenv/config';
 
 async function getUserIdByToken(realCookie){

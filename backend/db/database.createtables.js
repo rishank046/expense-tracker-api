@@ -1,4 +1,4 @@
-import db from './database.js';
+import db from './database.connect.js';
 import 'dotenv/config';
 
 // dscr is description about the expense
