@@ -3,6 +3,10 @@ import 'dotenv/config';
 
 async function getUserIdByToken(realCookie){
 
+    if(typeof realCookie === undefined){
+        return null;
+    }
+
     const session_id = realCookie
         .split('; ')
         .filter(function (element){

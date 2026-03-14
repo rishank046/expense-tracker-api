@@ -13,7 +13,7 @@ export default catchWrapper(async (req , res) => {
     }
 
     // get user id from the token as a cookie
-    const userId = await getIdByToken(req.cookie);
+    const userId = await getIdByToken(req.headers.cookie);
     if(!userId){
         throw new Error('no user found');
     }

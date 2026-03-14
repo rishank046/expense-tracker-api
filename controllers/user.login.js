@@ -8,7 +8,6 @@ export default wrapper(async (req , res) => {
 
     if(!email || !password){
         let error = new Error("required fields are missing");
-        error.code = 400;
         throw error;
     }
 
@@ -21,6 +20,7 @@ export default wrapper(async (req , res) => {
     if(user.length === 0){
        return null; 
     }
+
     else{
         const userId = user[0].usr_id;
         const [userToken] = await db.query(`
@@ -30,12 +30,18 @@ export default wrapper(async (req , res) => {
         if(userToken.length === 0){
             const token = crypto.randomBytes(10).toString('hex');
             await db.query(createLoginToken , [token , userId]);
-            res.statusCode = 201;
-            res.end(JSON.stringify(token));
+            res.writeHead(201 , {
+                'Set-Cookie' : `token=${token}; HttpOnly; Path=/;`,
+                'Content-Type' : 'text/plain'
+            })
+            res.end();
         }
         else{
-            res.statusCode = 200;
-            res.end(JSON.stringify({token : `${userToken[0].token}`}))
+            res.writeHead(200 , {
+                'Set-Cookie' : `token=${userToken[0].token}; HttpOnly; Path=/;`,
+                'Content-Type' : 'text/plain'
+            })
+            res.end();
         }
     }
 })

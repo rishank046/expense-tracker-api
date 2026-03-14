@@ -1,5 +1,6 @@
 import wrapper from '../utils/catchWrapper.js';
 import parseBody from '../utils/parseBody.js';
+import db from '../db/database.connect.js';
 
 export default wrapper( async (req , res) => {
    const {userName , email , password} = await parseBody(req);

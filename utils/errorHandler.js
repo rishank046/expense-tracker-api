@@ -1,5 +1,5 @@
 export default function(error , res){
-    res.statusCode = error.code;
+    res.statusCode = 500;
     const errorMessage = `${error.message}`;
     res.end(errorMessage);
     return;

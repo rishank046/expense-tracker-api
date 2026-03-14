@@ -1,5 +1,5 @@
 import http from 'node:http';
-import initDB from './db/initDB.js';
+import initDB from './db/database.createtables.js';
 import 'dotenv/config';
 import route from './routes/routes.js';
 

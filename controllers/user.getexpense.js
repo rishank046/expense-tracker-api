@@ -1,17 +1,16 @@
 import wrapper from '../utils/catchWrapper.js';
-import getExpService from '../db/getExpense.service.js';
-import parseBody from '../utils/parseBody.js';
+import getExpService from '../services/getExpense.service.js';
+import idByToken from '../controllers/user.idbytoken.js';
 
 export default wrapper(async (req , res) => {
-    const body = await parseBody(req);
-    
-    if(!body || !body.userId){
-        res.writeHead(404 , 'user not found');
-        res.end();
-        return;
+    // need the token to access website functionality
+    const userId = await idByToken(req.headers.cookie);
+
+    if(!userId){ 
+        throw new Error('user not logged in');
     }
 
-    let expString = await getExpService(body.userId); 
+    let expString = await getExpService(userId); 
 
     if(!expString || expString.length == 0){
         res.statusCode = 404;
