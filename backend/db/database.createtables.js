@@ -21,6 +21,7 @@ const init = async () => {
             usr_id INT NOT NULL,
             FOREIGN KEY (usr_id) REFERENCES user_data(usr_id) ON DELETE CASCADE
         )`
+
     const makeTokenTable = `
         CREATE TABLE IF NOT EXISTS ${process.env.TOKEN_TABLE_NAME} (
             token VARCHAR(100),
@@ -33,6 +34,7 @@ const init = async () => {
         await db.query(makeTokenTable);
         console.log('Made user table');
     }
+
     catch (error){
         console.log(`cannot able to connect to db ${error}`)
     }
