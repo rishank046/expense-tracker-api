@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 async function getUserIdByToken(realCookie){
 
-    if(typeof realCookie === undefined){
+    if(!realCookie){
         return null;
     }
 

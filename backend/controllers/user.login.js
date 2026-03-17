@@ -31,14 +31,14 @@ export default wrapper(async (req , res) => {
             const token = crypto.randomBytes(10).toString('hex');
             await db.query(createLoginToken , [token , userId]);
             res.writeHead(201 , {
-                'Set-Cookie' : `token=${token}; HttpOnly; Path=/;`,
+                'Set-Cookie' : `session_id=${token}; HttpOnly; Path=/;`,
                 'Content-Type' : 'text/plain'
             })
             res.end();
         }
         else{
             res.writeHead(200 , {
-                'Set-Cookie' : `token=${userToken[0].token}; HttpOnly; Path=/;`,
+                'Set-Cookie' : `session_id=${userToken[0].token}; HttpOnly; Path=/;`,
                 'Content-Type' : 'text/plain'
             })
             res.end();
