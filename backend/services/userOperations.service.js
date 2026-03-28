@@ -5,7 +5,8 @@ export async function userLogIn(data) {
   const { email, password } = data;
 
   if (!email || !password) {
-    let error = new Error("required fields are missing");
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
     throw error;
   }
 
@@ -19,7 +20,9 @@ export async function userLogIn(data) {
   );
 
   if (user.length === 0) {
-    return null;
+    let error = new Error();
+    error.code = "No_User_Found";
+    throw error;
   } else {
     const userId = user[0].usr_id;
     const [userToken] = await db.query(
@@ -43,7 +46,8 @@ export async function userSignIn(data) {
   const { userName, email, password } = data;
 
   if (!userName || !email || !password) {
-    const error = new Error("required field are missing");
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
     throw error;
   }
 
@@ -57,8 +61,9 @@ export async function userSignIn(data) {
       `INSERT INTO ${process.env.USER_TABLE_NAME} (usr_nm , usr_email , usr_pswd) VALUES (?, ?, ?)`,
       [userName, email, password],
     );
-    return 0;
   } else {
-    return 1;
+    let error = new Error();
+    error.code = "User_Already_Exists";
+    throw error;
   }
 }

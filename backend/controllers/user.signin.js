@@ -4,12 +4,8 @@ import { userSignIn } from "../services/userOperations.service.js";
 
 export default wrapper(async (req, res) => {
   const data = await parseBody(req);
+  await userSignIn(data);
 
-  if (!userSignIn(data)) {
-    res.statusCode = 200;
-    res.end();
-  } else {
-    res.statusCode = 409;
-    res.end();
-  }
+  res.statusCode = 200;
+  res.end();
 });

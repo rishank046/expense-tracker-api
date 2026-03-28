@@ -1,58 +1,58 @@
-import getIdByToken from "../controllers/user.idbytoken.js";
 import db from "../db/database.connect.js";
 
 export async function createExpense(data) {
-  const { amount, description, userId, categoryId } = data;
-  if (!userId) {
-    throw new Error("no user found");
-  }
+  const { amount, description, sessionId, categoryId } = data;
 
   // add expense to the database
   await db.query(
-    `INSERT INTO ${process.env.EXPENSE_TABLE_NAME} (category_id , userId , amount , description) VALUES (? , ? , ? , ?)`,
-    [categoryId, userId, amount, description],
+    `INSERT INTO ${process.env.EXPENSE_TABLE_NAME} (category_id , userId , amount , description) VALUES (? , (
+        SELECT userId FROM Token WHERE token = ? 
+    ) , ? , ?)`,
+    [categoryId, sessionId, amount, description],
   );
-
-  return 0;
 }
 
 export async function getExpense(data) {
-  const { userId } = data;
-  if (!userId) {
-    throw new Error("user not logged in");
-  }
+  const { token } = data;
 
-  let expString = await db.query(
-    `SELECT * FROM ${process.env.EXPENSE_TABLE_NAME} WHERE userId = ?`,
-    [userId],
+  let [row] = await db.query(
+    `SELECT e.expense_id , c.name AS categoryName , e.amount , e.description , e.created_at FROM ${process.env.EXPENSE_TABLE_NAME} AS e
+        JOIN Category AS c ON e.category_id = c.id
+        WHERE e.userId = (
+            SELECT userId FROM Token WHERE token = ?
+        )`,
+    [token],
   );
 
-  if (!expString || expString.length == 0) {
-    return false;
+  if (!row || row.length == 0) {
+    let error = new Error();
+    error.code = "No_Expense_Found";
+    throw error;
   }
 
-  return JSON.stringify(expString);
+  return row;
 }
 
 export async function deleteExpense(data) {
   if (!data || !data?.expense_id) {
-    throw new Error("details are not provided");
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error;
   }
   const deleteExpense = `DELETE FROM ${process.env.EXPENSE_TABLE_NAME} WHERE expense_id = ?`;
 
   db.query(deleteExpense, [data?.expense_id]);
-
-  return 0;
 }
 
 export async function updateExpense(data) {
   if (!data || !data?.expenseId) {
-    throw new Error("details are not provided");
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error;
   } else {
     db.query(
       `DELETE FROM ${process.env.EXPENSE_TABLE_NAME} WHERE expenseId = ?`,
       [data?.expense_id],
     );
-    return 0;
   }
 }

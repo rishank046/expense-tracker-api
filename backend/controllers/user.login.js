@@ -7,15 +7,10 @@ export default wrapper(async (req, res) => {
 
   const token = await userLogIn(data);
 
-  if (token) {
-    res.writeHead(200, {
-      "Set-Cookie": `token=${token}; Max-Age=43200; Path=/; HttpOnly; Secure;`,
-      "Access-Controll-Origin-Credentials": "true",
-      "Access-Controll-Allow-Origin": "http://www.expensetracker.com",
-    });
-    res.end();
-  } else {
-    res.statusCode = 404;
-    res.end();
-  }
+  res.writeHead(200, {
+    "Set-Cookie": `token=${token}; Max-Age=43200; Path=/; HttpOnly; Secure;`,
+    "Access-Controll-Origin-Credentials": "true",
+    "Access-Controll-Allow-Origin": "http://www.expensetracker.com",
+  });
+  res.end();
 });

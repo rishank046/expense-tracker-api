@@ -6,18 +6,11 @@ import { getExpense } from "../services/expenseOperations.service.js";
 export default wrapper(async (req, res) => {
   // need the token to access website functionality
   const data = await parseBody(req);
-  const userId = await idByToken(req.headers.cookie);
-  data.userId = userId;
+  const token = await idByToken(req.headers.cookie);
+  data.token = token;
 
   let expenses = await getExpense(data);
 
-  if (expenses) {
-    res.statusCode = 200;
-    res.end(JSON.stringify(expenses));
-    return;
-  } else {
-    res.statusCode = 500;
-    res.end();
-    return;
-  }
+  res.statusCode = 200;
+  res.end(JSON.stringify(expenses));
 });
