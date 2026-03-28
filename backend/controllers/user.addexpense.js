@@ -1,27 +1,18 @@
-import createExpense from '../services/addexpense.service.js';
-import catchWrapper from '../utils/catchWrapper.js';
-import parseBody from '../utils/parseBody.js';
-import getIdByToken from '../controllers/user.idbytoken.js';
+import catchWrapper from "../utils/catchWrapper.js";
+import parseBody from "../utils/parseBody.js";
+import { createExpense } from "../services/expenseOperations.service.js";
+import getUserIdByToken from "./user.idbytoken.js";
 
-export default catchWrapper(async (req , res) => {
-    const data = await parseBody(req);
-    
-    if(!data.amount && !data.description){
-        res.statusCode = 400;
-        res.end(JSON.stringify({error : 'missing required field'}));
-        return;
-    }
+export default catchWrapper(async (req, res) => {
+  const data = await parseBody(req);
+  const userId = await getUserIdByToken(req.headers.cookie);
+  data.userId = userId;
 
-    // get user id from the token as a cookie
-    const userId = await getIdByToken(req.headers.cookie);
-    if(!userId){
-        throw new Error('no user found');
-    }
-
-    // add expense to the database
-    await createExpense(data.amount , data.description , userId);
-
+  if (createExpense(data)) {
     res.statusCode = 200;
-    res.end('added expense');
-    return;
+    res.end();
+  } else {
+    res.statusCode = 500;
+    res.end();
+  }
 });

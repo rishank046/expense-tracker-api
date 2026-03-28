@@ -1,23 +1,23 @@
-import wrapper from '../utils/catchWrapper.js';
-import getExpService from '../services/getExpense.service.js';
-import idByToken from '../controllers/user.idbytoken.js';
+import wrapper from "../utils/catchWrapper.js";
+import idByToken from "../controllers/user.idbytoken.js";
+import parseBody from "../utils/parseBody.js";
+import { getExpense } from "../services/expenseOperations.service.js";
 
-export default wrapper(async (req , res) => {
-    // need the token to access website functionality
-    const userId = await idByToken(req.headers.cookie);
+export default wrapper(async (req, res) => {
+  // need the token to access website functionality
+  const data = await parseBody(req);
+  const userId = await idByToken(req.headers.cookie);
+  data.userId = userId;
 
-    if(!userId){ 
-        throw new Error('user not logged in');
-    }
+  let expenses = await getExpense(data);
 
-    let expString = await getExpService(userId); 
-
-    if(!expString || expString.length == 0){
-        res.statusCode = 404;
-        res.end('expense not found');
-        return;
-    }
-
+  if (expenses) {
     res.statusCode = 200;
-    res.end(JSON.stringify(expString));
-})
+    res.end(JSON.stringify(expenses));
+    return;
+  } else {
+    res.statusCode = 500;
+    res.end();
+    return;
+  }
+});
