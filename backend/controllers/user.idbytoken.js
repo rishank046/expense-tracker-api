@@ -1,32 +1,26 @@
-import database from "../db/database.connect.js";
 import "dotenv/config";
 
 async function getUserIdByToken(realCookie) {
   if (!realCookie) {
     return null;
   }
-
-  const session_id = realCookie
+  const token = realCookie
     .split("; ")
     .filter(function (element) {
       const arr = element.split("=");
-      if (arr[0] === "session_id") {
+      if (arr[0] === "token") {
         return true;
       } else return false;
     })[0]
     ?.split("=")[1];
 
-  if (!session_id) return null;
+  if (!token) {
+    let error = new Error();
+    error.code = "No_Session_Id_Found";
+    throw error;
+  }
   // find userId after verifying the token session_id
-
-  const [userId] = await database.query(
-    `
-        SELECT * FROM ${process.env.TOKEN_TABLE_NAME} WHERE TOKEN=?
-    `,
-    [session_id],
-  );
-
-  return userId[0].usr_id;
+  return token;
 }
 
 export default getUserIdByToken;

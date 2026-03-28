@@ -8,11 +8,8 @@ export default catchWrapper(async (req, res) => {
   const userId = await getUserIdByToken(req.headers.cookie);
   data.userId = userId;
 
-  if (createExpense(data)) {
-    res.statusCode = 200;
-    res.end();
-  } else {
-    res.statusCode = 500;
-    res.end();
-  }
+  await createExpense(data);
+
+  res.statusCode = 200;
+  res.end();
 });

@@ -44,8 +44,8 @@ const init = async () => {
     await db.query(`
     CREATE TABLE IF NOT EXISTS ${process.env.TOKEN_TABLE_NAME} (
         token VARCHAR(255) PRIMARY KEY, 
-        usr_id INT NOT NULL,
-        FOREIGN KEY (usr_id) REFERENCES ${process.env.USER_TABLE_NAME}(usr_id) ON DELETE CASCADE
+        userId INT NOT NULL UNIQUE,
+        FOREIGN KEY (userId) REFERENCES ${process.env.USER_TABLE_NAME}(userId) ON DELETE CASCADE
     );
             `);
     console.log("Made user table");
