@@ -1,47 +1,21 @@
-import db from '../db/database.connect.js';
-import crypto from 'node:crypto';
-import wrapper from '../utils/catchWrapper.js';
-import parseBody from '../utils/parseBody.js';
+import parseBody from "../utils/parseBody.js";
+import wrapper from "../utils/catchWrapper.js";
+import { userLogIn } from "../services/userOperations.service.js";
 
-export default wrapper(async (req , res) => {
-    const {email , password} = await parseBody(req);
+export default wrapper(async (req, res) => {
+  const data = await parseBody(req);
 
-    if(!email || !password){
-        let error = new Error("required fields are missing");
-        throw error;
-    }
+  const token = await userLogIn(data);
 
-    const createLoginToken = `
-        INSERT INTO ${process.env.TOKEN_TABLE_NAME} (token , usr_id) VALUES (? , ?) 
-    `
-    const [user] = await db.query(`
-        SELECT * FROM ${process.env.USER_TABLE_NAME} WHERE usr_email = ? AND usr_pswd = ?` , [email , password]);
-    
-    if(user.length === 0){
-       return null; 
-    }
-
-    else{
-        const userId = user[0].usr_id;
-        const [userToken] = await db.query(`
-            SELECT * FROM ${process.env.TOKEN_TABLE_NAME} WHERE usr_id = ?
-        ` , [userId]);
-        
-        if(userToken.length === 0){
-            const token = crypto.randomBytes(10).toString('hex');
-            await db.query(createLoginToken , [token , userId]);
-            res.writeHead(201 , {
-                'Set-Cookie' : `session_id=${token}; HttpOnly; Path=/;`,
-                'Content-Type' : 'text/plain'
-            })
-            res.end();
-        }
-        else{
-            res.writeHead(200 , {
-                'Set-Cookie' : `session_id=${userToken[0].token}; HttpOnly; Path=/;`,
-                'Content-Type' : 'text/plain'
-            })
-            res.end();
-        }
-    }
-})
+  if (token) {
+    res.writeHead(200, {
+      "Set-Cookie": `token=${token}; Max-Age=43200; Path=/; HttpOnly; Secure;`,
+      "Access-Controll-Origin-Credentials": "true",
+      "Access-Controll-Allow-Origin": "http://www.expensetracker.com",
+    });
+    res.end();
+  } else {
+    res.statusCode = 404;
+    res.end();
+  }
+});

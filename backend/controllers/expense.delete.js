@@ -1,16 +1,16 @@
 import wrapper from '../utils/catchWrapper.js';
 import parseBody from '../utils/parseBody.js';
-import db from '../db/database.connect.js';
+import { deleteExpense } from '../services/expenseOperations.service.js';
 
 export default wrapper(async (req , res) => {
     const data = await parseBody(req);
-
-    if(!data || !data.expense_id){
-        throw new Error('details are not provided')
+    
+    if(!deleteExpense(data)){
+        res.statusCode = 200;
+        res.end();
     }
-    const deleteExpense = `DELETE FROM ${process.env.EXPENSE_TABLE_NAME} WHERE expense_id = ?`;
-
-    db.query(deleteExpense , [data.expense_id]);
-    res.statusCode = 200;
-    res.end();
+    else {
+        res.statusCode = 404;
+        res.end();
+    }
 })
