@@ -34,14 +34,14 @@ export async function getExpense(data) {
 }
 
 export async function deleteExpense(data) {
-  if (!data || !data?.expense_id) {
+  if (!data || !data?.expenseId) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
   const deleteExpense = `DELETE FROM ${process.env.EXPENSE_TABLE_NAME} WHERE expense_id = ?`;
 
-  db.query(deleteExpense, [data?.expense_id]);
+  db.query(deleteExpense, [data?.expenseId]);
 }
 
 export async function updateExpense(data) {
