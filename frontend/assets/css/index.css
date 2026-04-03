@@ -1,0 +1,144 @@
+:root {
+    --bg-dark : hsl(0 , 0% , 5%);
+    --bg : hsl(0 , 0% , 10%);
+    --bg-light : hsl(0 , 0% , 20%);
+    --text : hsl(0 , 0% , 95%);
+    --text-muted : hsl(0 , 0% , 70%);
+    --accent : hsl(261, 51%, 51%);
+    --border-top : hsl(0 , 0% , 30%);
+    --border-bottom : hsl(0 , 0% , 10%);
+}
+
+[data-theme='light'] {
+    --bg-dark : hsl(0 , 0% , 85%);
+    --bg : hsl(0 , 0% , 90%);
+    --bg-light : hsl(0 , 0% , 95%);
+    --text : hsl(0 , 0% , 5%);
+    --text-muted : hsl(0 , 0% , 30%);
+    --accent : hsl(261, 51%, 51%);
+    --border-top : hsl(0 , 0% , 100%);
+    --border-bottom : hsl(0 , 0% , 85%);
+}
+
+html{
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar {
+    display: none !important;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    color: var(--text);
+}
+
+header{
+    min-height: 5vh;
+    width: 100vw;
+    max-width: 1600px;
+    background-color: var(--bg);
+    box-sizing: border-box;
+    display: flex;
+    justify-content:space-between;
+}
+
+header > img{
+    display: inline-block;
+    width: 20%;
+    max-width: 50%;
+}
+
+header > nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 40vw;
+}
+
+header > nav > ul{
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 0;
+}
+
+header > nav > ul > li >a{
+    text-decoration: none;
+    color: var(--text);
+}
+
+#theme-toggle{
+    all: unset;
+    background-color: var(--bg-light);
+    padding: 0.5rem;
+    border-radius: 5px;
+    border-top: 1px solid var(--border-top);
+    border-bottom: 1px solid var(--border-bottom);
+}
+
+.auth-actions{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-actions > button{
+    all: unset;
+    min-height: 4vh;
+    width: 5vw;
+    max-width: 10vw;
+    border-radius: 5px;
+    text-align: center;
+    background-color: var(--bg-light);
+    color: var(--text-muted);
+    box-sizing: border-box;
+    border-top: 1px solid var(--border-top);
+    border-bottom: 1px solid var(--border-bottom);
+}
+
+main{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    min-height: 85vh;
+    width: 100vw;
+    max-width: 1600px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.graphicalViewLeft{
+    min-height: 70%;
+    width: 29%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.totalExpense{
+    min-height: 49%;
+    width: 100%;
+    border-radius: 5px;
+    background-color: var(--bg);
+}
+
+.expenseChart{
+    min-height: 49%;
+    width: 100%;
+    border-radius: 5px;
+    background-color: var(--bg);
+}
+
+.expenseTableRight{
+    min-height: 70%;
+    width: 69%;
+    border-radius: 5px;
+    background-color: var(--bg);
+}
