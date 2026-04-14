@@ -37,11 +37,11 @@ export async function deleteExpense(data) {
 }
 
 export async function updateExpense(data) {
-  if (!data || !data?.expenseId) {
+  if (!data?.expenseId || !data?.column || !data?.value) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   } else {
-    await db.query(UPDATE_EXPENSE, [data?.expense_id]);
+    await db.query(UPDATE_EXPENSE, [data.column, data.value, data.expenseId]);
   }
 }

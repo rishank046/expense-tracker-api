@@ -17,8 +17,7 @@ export const GET_EXPENSE = `
   WHERE e.userId = (SELECT userId FROM Token WHERE token = ?)
 `;
 
-export const UPDATE_EXPENSE =
-  "UPDATE Expenses SET category_id = ?, amount = ?, description = ? WHERE expense_id = ?";
+export const UPDATE_EXPENSE = "UPDATE Expenses SET ? = ? WHERE expenseId = ?";
 
 export const ADD_LOGIN_TOKEN =
   "INSERT INTO Token (token, userId) VALUES (?, ?)";

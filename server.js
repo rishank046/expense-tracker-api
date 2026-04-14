@@ -10,7 +10,7 @@ const server = http.createServer(async function (req, res) {
 });
 
 initDB().then(() => {
-  server.listen(process.env.PORT, "::", function () {
+  server.listen(process.env.PORT, "0.0.0.0", function () {
     console.log("Server is working and running");
   });
 });

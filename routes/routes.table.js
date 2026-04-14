@@ -4,6 +4,7 @@ import filterExpenseByAmount from "../controllers/expense.filterbyamount.js";
 import logIn from "../controllers/user.login.js";
 import register from "../controllers/user.signin.js";
 import deleteExpense from "../controllers/expense.delete.js";
+import updateExpense from "../controllers/expense.update.js";
 
 const routesObj = {
   GET: {
@@ -15,6 +16,7 @@ const routesObj = {
     "/logIn": logIn,
     "/register": register,
     "/deleteExpense": deleteExpense,
+    "/updateExpense": updateExpense,
   },
   HEAD: {},
   PATCH: {},
