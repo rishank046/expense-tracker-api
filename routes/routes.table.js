@@ -5,11 +5,13 @@ import logIn from "../controllers/user.login.js";
 import register from "../controllers/user.signin.js";
 import deleteExpense from "../controllers/expense.delete.js";
 import updateExpense from "../controllers/expense.update.js";
+import getSummary from "../controllers/expense.getSummary.js";
 
 const routesObj = {
   GET: {
     "/getExpense": getExpense,
     "/filterExpense": filterExpenseByAmount,
+    "/getSummary": getSummary,
   },
   POST: {
     "/addExpense": addExpense,

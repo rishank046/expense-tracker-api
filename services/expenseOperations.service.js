@@ -4,6 +4,7 @@ import {
   GET_EXPENSE,
   DELETE_EXPENSE,
   UPDATE_EXPENSE,
+  GET_SUMMARY,
 } from "../model/database.queries.js";
 
 export async function createExpense(data) {
@@ -44,4 +45,19 @@ export async function updateExpense(data) {
   } else {
     await db.query(UPDATE_EXPENSE, [data.column, data.value, data.expenseId]);
   }
+}
+
+export async function getSummary(data) {
+  if (!data?.startDate || !data?.endDate || !data?.userId) {
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error;
+  }
+  let summary = await db.query(GET_SUMMARY, [
+    data.userId,
+    data.startDate,
+    data.endDate,
+  ]);
+
+  return summary;
 }

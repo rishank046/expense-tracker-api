@@ -23,3 +23,6 @@ export const ADD_LOGIN_TOKEN =
   "INSERT INTO Token (token, userId) VALUES (?, ?)";
 
 export const GET_USER_TOKEN = "SELECT * FROM Token WHERE userId = ?";
+
+export const GET_SUMMARY = `
+SELECT MIN(created_at) AS fromDate , MAX(created_at)  , SUM(amount) AS totalExpense FROM Expenses WHERE userId = ? && created_at > ? && created_at < ?;`;
