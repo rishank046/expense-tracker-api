@@ -2,6 +2,8 @@
 ### a expense tracker api that focuses on financial management and a modern User Interface that makes using API easy. 
 ### This project features a custom-built REST API using Vanilla Node.js and mySql for database management.
 
+### I used Node.js without any framwork because i wanted to learn how routing actually works under the hood, what are CORS
+
 # Technologies used
 * used JS on NODE.JS
 * mySql as database
@@ -11,6 +13,9 @@
 
 ### start local mySql server
 * on Linux
+### on linux before starting the server itself we have to start the database or if using a different database server like Aiven edit the .env file and add assential information 
+
+#### start mysql server using this command
 ```
 sudo systemctl start mysqld
 ```

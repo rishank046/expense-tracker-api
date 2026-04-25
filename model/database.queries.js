@@ -32,3 +32,11 @@ SELECT 1 FROM Token WHERE token = ?)
 export const INSERT_USER_PROFILE = `
     INSERT INTO  userProfile (userId , salary , minimum_expense , expense_goal) VALUES (? , ? , ? , ?);
 `;
+export const DELETE_TOKEN = `
+    DELETE FROM Token WHERE token = ?;
+`;
+export const VERIFY_TOKEN_EXPIRY = `
+    SELECT TIMESTAMPDIFF(hour , (
+    SELECT created_at FROM Token WHERE token = ?
+    ) , CURRENT_TIMESTAMP);
+`;

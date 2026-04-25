@@ -45,6 +45,7 @@ const init = async () => {
     CREATE TABLE IF NOT EXISTS ${process.env.TOKEN_TABLE_NAME} (
         token VARCHAR(255) PRIMARY KEY, 
         userId INT NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (userId) REFERENCES ${process.env.USER_TABLE_NAME}(userId) ON DELETE CASCADE
     );
             `);
