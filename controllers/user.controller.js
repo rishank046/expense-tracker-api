@@ -30,7 +30,7 @@ export default wrapper(async function (req, res) {
         throw error;
       }
 
-      await userSignIn(body);
+      await userServices.userSignIn(body);
 
       res.statusCode = 200;
       res.end();
