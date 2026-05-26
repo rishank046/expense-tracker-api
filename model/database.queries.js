@@ -38,3 +38,11 @@ export const INSERT_USER_PROFILE = `
 export const DELETE_TOKEN = `
     DELETE FROM Token WHERE token = ?;
 `;
+
+export const FILTER_AMOUNT = `
+SELECT amnt , dscr FROM Expenses WHERE amnt <= ? AND usr_id= ?
+`;
+
+export const GET_USER_ID_BY_TOKEN = `
+SELECT userId FROM Token WHERE token = ?
+`;

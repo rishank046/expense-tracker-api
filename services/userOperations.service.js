@@ -11,8 +11,13 @@ import {
   DELETE_TOKEN,
 } from "../model/database.queries.js";
 
-export async function userLogIn(data) {
-  const { email, password } = data;
+export async function userLogIn(req , res , next) {
+  const { email, password } = req.body;
+  if(!email || !password){
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error;
+  }
 
   const [user] = await db.query(GET_USER, [email]);
   // new code
@@ -28,27 +33,55 @@ export async function userLogIn(data) {
     const [token] = await db.query(GET_USER_TOKEN, [user[0].userId]);
     //if token exists and not expired
     if (token[0] && token[0].hours_elapsed < 24) {
-      return token[0].token;
+      res.cookie("token", token[0].token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      res.status(200).end();
     }
     // if token does not exists
     else if (!token[0]) {
       const newToken = crypto.randomBytes(10).toString("hex");
       await db.query(ADD_LOGIN_TOKEN, [newToken, user[0].userId]);
-      return newToken;
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      res.status(200).end();
+
     }
     //if the token is expired
     else {
-      db.query(DELETE_TOKEN, [token[0].token]);
+      await db.query(DELETE_TOKEN, [token[0].token]);
       const newToken = crypto.randomBytes(10).toString("hex");
       await db.query(ADD_LOGIN_TOKEN, [newToken, user[0].userId]);
-      return newToken;
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      res.status(200).end();
     }
+  }
+
+  else{
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error; 
   }
 }
 
-export async function userSignIn(data) {
-  const { name, email } = data;
-  let { password } = data;
+export async function userSignIn(req , res , next) {
+  const { name, email } = req.body;
+  let { password } = req.body;
+
+  if(!name || !email || !password){
+    let error = new Error();
+    error.code = "Missing_Required_Fields";
+    throw error;
+  }
 
   const [userRow] = await db.query(CHECK_USER_CREATED, [email]);
 
@@ -62,14 +95,17 @@ export async function userSignIn(data) {
     error.code = "User_Already_Exists";
     throw error;
   }
+
+    res.status(200).end();
 }
 
-export async function setupProfile(data) {
-  const { userId, salary, minimumExpense, expenseGoal } = data;
+export async function setupProfile(req , res , next) {
+  const { userId, salary, minimumExpense, expenseGoal } = req.body;
   if (!userId || !salary || !minimumExpense || !expenseGoal) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
-  db.query(INSERT_USER_PROFILE, [userId, salary, minimumExpense, expenseGoal]);
+  await db.query(INSERT_USER_PROFILE, [userId, salary, minimumExpense, expenseGoal]);
+  res.status(200).end();
 }
