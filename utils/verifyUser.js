@@ -3,14 +3,15 @@ import bcrypt from "bcrypt";
 import { GET_USER_ID_BY_TOKEN } from "../model/database.queries.js";
 
 export default async function verifyUser(req , res , next){
-    const { token } = req.body;
+    const token = req.cookies.token;
+
     if(!token){
         let error = new Error();
         error.code = "Missing_Required_Fields";
         throw error;
     }
 
-    const [user] = await db.query(GET_USER_ID, [token]);
+    const [user] = await db.query(GET_USER_ID_BY_TOKEN, [token]);
 
     if(user.length === 0){
         let error = new Error();

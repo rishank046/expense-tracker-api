@@ -2,15 +2,17 @@ import initDB from "./db/database.createtables.js";
 import "dotenv/config";
 import userRouter from './routes/user.routes.js';
 import expenseRouter from './routes/expense.routes.js';
+import cookieParser from 'cookie-parser';
 
 import express from 'express';
 const app = express();
 
 //parse data 
+app.use(cookieParser());
 app.use(express.json());
 
 app.use('/user' , userRouter);
-app.use('/expense' , expenseRouter);
+app.use('/user' , expenseRouter);
 
 initDB().then(() => {
   app.listen(process.env.PORT , () => {

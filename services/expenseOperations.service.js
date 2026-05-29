@@ -26,8 +26,9 @@ export async function getExpense(req , res , next) {
 
   let [row] = await db.query(GET_EXPENSE, [token]);
 
-  return row;
+  res.status(200).json(row);
 }
+
 
 export async function deleteExpense(req , res , next) {
   const { expenseId } = req.body;
