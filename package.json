@@ -5,9 +5,10 @@
   "license": "ISC",
   "author": "Rishank Kumar",
   "type": "module",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo 'No build required'"
   },
   "keywords": [],
   "dependencies": {
@@ -19,5 +20,4 @@
     "nodemon": "^3.1.14",
     "zod": "^4.4.3"
   }
-}
 }
