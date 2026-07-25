@@ -7,10 +7,11 @@ const router = express.Router();
 
 router.use(wrapper(verifyUser));
 
-router.post('/addExpense' , wrapper(expenseOperations.createExpense));
-router.get('/getExpense' , wrapper(expenseOperations.getExpense));
-router.post('/deleteExpense' , wrapper(expenseOperations.deleteExpense));
-router.put('/updateExpense' , wrapper(expenseOperations.updateExpense));
-router.get('/getSummary' , wrapper(expenseOperations.getSummary));
+router.post('/addExpense', wrapper(expenseOperations.createExpense));
+router.get('/getExpense', wrapper(expenseOperations.getExpense));
+router.post('/deleteExpense', wrapper(expenseOperations.deleteExpense));
+router.put('/updateExpense', wrapper(expenseOperations.updateExpense));
+router.get('/getSummary', wrapper(expenseOperations.getSummary));
+router.get('/filterAmount', wrapper(expenseOperations.filterAmount));
 
 export default router;

@@ -1,26 +1,26 @@
 import db from "../db/database.connect.js";
-import bcrypt from "bcrypt";
 import { GET_USER_ID_BY_TOKEN } from "../model/database.queries.js";
 
-export default async function verifyUser(req , res , next){
-    const token = req.cookies.token;
+export default async function verifyUser(req, res, next) {
+    const token = req.cookies?.token || req.headers?.authorization?.replace('Bearer ', '');
 
-    if(!token){
+    if (!token) {
         let error = new Error();
-        error.code = "Missing_Required_Fields";
+        error.code = "No_Session_Id_Found";
         throw error;
     }
 
-    const [user] = await db.query(GET_USER_ID_BY_TOKEN, [token]);
+    const [rows] = await db.query(GET_USER_ID_BY_TOKEN, [token]);
 
-    if(user.length === 0){
+    if (!rows || rows.length === 0) {
         let error = new Error();
         error.code = "Unauthorized";
         throw error;
     }
-    else{
-        req.body.userId = user[0].userId;
-        next();
-    }
 
+    req.userId = rows[0].userId;
+    if (req.body && typeof req.body === 'object') {
+        req.body.userId = rows[0].userId;
+    }
+    next();
 }

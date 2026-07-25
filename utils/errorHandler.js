@@ -1,90 +1,79 @@
 export default function (error, res) {
   const errors = {
     Missing_Required_Fields: {
-      message: "information is not correct or not given",
+      message: "Information is not correct or missing",
       statusCode: 400,
     },
     Unauthorized: {
-      message: "user have to log in first",
+      message: "User must log in first",
       statusCode: 401,
     },
     No_Resource_Found: {
-      message: "the resource is not available or mistyped",
+      message: "The resource is not available",
       statusCode: 404,
     },
     No_User_Found: {
-      message: "user not found in the database",
+      message: "User not found",
       statusCode: 404,
     },
     No_Expense_Found: {
-      message: "expense not found that you are looking for",
+      message: "Expense not found",
       statusCode: 404,
     },
     User_Already_Exists: {
-      message: "user already available for this email",
+      message: "An account with this email already exists",
       statusCode: 409,
     },
     Too_Many_Requests: {
-      message: "got too many request",
+      message: "Too many requests",
       statusCode: 429,
     },
     Database_Error: {
-      message: "database got an error",
+      message: "Database error occurred",
       statusCode: 500,
     },
     Internal_Server_Error: {
-      message: "server got an error",
+      message: "Internal server error",
       statusCode: 500,
     },
     No_Session_Id_Found: {
-      message: "no session id found have to login first",
+      message: "No session found, please log in",
       statusCode: 401,
     },
     ECONNREFUSED: {
-      message: "unable to connect to the database",
+      message: "Unable to connect to the database",
       statusCode: 503,
     },
-    57014: { message: "database query timed out", statusCode: 504 },
+    57014: { message: "Database query timed out", statusCode: 504 },
     23505: {
-      message: "record already exists (duplicate entry)",
+      message: "Record already exists",
       statusCode: 409,
     },
-    23503: { message: "referenced record does not exist", statusCode: 400 },
+    ER_DUP_ENTRY: {
+      message: "Record already exists",
+      statusCode: 409,
+    },
+    1062: {
+      message: "Record already exists",
+      statusCode: 409,
+    },
+    23503: { message: "Referenced record does not exist", statusCode: 400 },
     23502: {
-      message: "required field is missing (null violation)",
+      message: "Required field is missing",
       statusCode: 400,
     },
-    "22P02": { message: "invalid data type provided", statusCode: 400 },
-    23514: { message: "value violates a check constraint", statusCode: 400 },
-    42703: { message: "column does not exist in the table", statusCode: 400 },
-    "42P01": {
-      message: "table does not exist in the database",
-      statusCode: 400,
-    },
-    42601: { message: "sql syntax error in the query", statusCode: 500 },
-    53300: { message: "too many database connections", statusCode: 503 },
-    53200: { message: "database ran out of memory", statusCode: 503 },
-    "40P01": {
-      message: "deadlock detected between transactions",
-      statusCode: 500,
-    },
-    40001: {
-      message: "transaction conflict, serialization failed",
-      statusCode: 500,
-    },
-    "08006": { message: "database connection was lost", statusCode: 503 },
-    "08001": { message: "database connection was rejected", statusCode: 503 },
-    "28P01": { message: "invalid database credentials", statusCode: 401 },
-    "3D000": { message: "database does not exist", statusCode: 500 },
   };
 
-  if (errors?.[error.code]) {
-    res.statusCode = errors[error.code].statusCode;
-    res.end(errors[error.code].message);
-    return;
+  res.setHeader("Content-Type", "application/json");
+
+  const errorKey = error?.code || error?.errno;
+  if (errors[errorKey]) {
+    const errObj = errors[errorKey];
+    res.statusCode = errObj.statusCode;
+    res.end(JSON.stringify({ error: errObj.message }));
   } else {
+    console.error("Unhandled Error:", error);
     res.statusCode = 500;
-    res.end(`${error}`);
-    return;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
   }
 }

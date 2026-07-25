@@ -2,7 +2,6 @@ import db from "../db/database.connect.js";
 import crypto from "node:crypto";
 import bcrypt from "bcrypt";
 import {
-  CHECK_USER_CREATED,
   GET_USER,
   ADD_LOGIN_TOKEN,
   CREATE_USER,
@@ -11,101 +10,89 @@ import {
   DELETE_TOKEN,
 } from "../model/database.queries.js";
 
-export async function userLogIn(req , res , next) {
-  const { email, password } = req.body;
-  if(!email || !password){
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+};
+
+export async function userLogIn(req, res, next) {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
 
-  const [user] = await db.query(GET_USER, [email]);
-  // new code
-  // user does not exists in database
-  if (user.length === 0) {
+  const [users] = await db.query(GET_USER, [email]);
+  if (!users || users.length === 0) {
+    let error = new Error();
+    error.code = "No_User_Found";
+    throw error;
+  }
+
+  const user = users[0];
+  const isMatch = await bcrypt.compare(password, user.userPassword);
+  if (!isMatch) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
-  // user exists in database
-  else if (await bcrypt.compare(password, user[0].userPassword)) {
-    // check token
-    const [token] = await db.query(GET_USER_TOKEN, [user[0].userId]);
-    //if token exists and not expired
-    if (token[0] && token[0].hours_elapsed < 24) {
-      res.cookie("token", token[0].token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
-      res.status(200).end();
-    }
-    // if token does not exists
-    else if (!token[0]) {
-      const newToken = crypto.randomBytes(10).toString("hex");
-      await db.query(ADD_LOGIN_TOKEN, [newToken, user[0].userId]);
-      res.cookie("token", newToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
-      res.status(200).end();
 
-    }
-    //if the token is expired
-    else {
-      await db.query(DELETE_TOKEN, [token[0].token]);
-      const newToken = crypto.randomBytes(10).toString("hex");
-      await db.query(ADD_LOGIN_TOKEN, [newToken, user[0].userId]);
-      res.cookie("token", newToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
-      res.status(200).end();
-    }
+  const [tokenRows] = await db.query(GET_USER_TOKEN, [user.userId]);
+  let activeToken = tokenRows[0];
+
+  if (activeToken && activeToken.hours_elapsed < 24) {
+    res.cookie("token", activeToken.token, COOKIE_OPTIONS);
+    return res.status(200).json({ message: "Login successful", token: activeToken.token });
   }
 
-  else{
+  if (activeToken) {
+    await db.query(DELETE_TOKEN, [activeToken.token]);
+  }
+
+  const newToken = crypto.randomBytes(32).toString("hex");
+  await db.query(ADD_LOGIN_TOKEN, [newToken, user.userId]);
+
+  res.cookie("token", newToken, COOKIE_OPTIONS);
+  return res.status(200).json({ message: "Login successful", token: newToken });
+}
+
+export async function userSignIn(req, res, next) {
+  const { name, email, password } = req.body || {};
+
+  if (!name || !email || !password) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
-    throw error; 
+    throw error;
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    await db.query(CREATE_USER, [name, email, hashedPassword]);
+    return res.status(201).json({ message: "User registered successfully" });
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY" || err.errno === 1062 || err.code === "23505") {
+      let error = new Error();
+      error.code = "User_Already_Exists";
+      throw error;
+    }
+    throw err;
   }
 }
 
-export async function userSignIn(req , res , next) {
-  const { name, email } = req.body;
-  let { password } = req.body;
+export async function setupProfile(req, res, next) {
+  const userId = req.userId || req.body?.userId;
+  const { salary, minimumExpense, expenseGoal } = req.body || {};
 
-  if(!name || !email || !password){
+  if (!userId || salary === undefined || minimumExpense === undefined || expenseGoal === undefined) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
 
-  const [userRow] = await db.query(CHECK_USER_CREATED, [email]);
-
-  let rounds = 10;
-  password = await bcrypt.hash(password, rounds);
-
-  if (userRow.length === 0) {
-    await db.query(CREATE_USER, [name, email, password]);
-  } else {
-    let error = new Error();
-    error.code = "User_Already_Exists";
-    throw error;
-  }
-
-    res.status(200).end();
-}
-
-export async function setupProfile(req , res , next) {
-  const { userId, salary, minimumExpense, expenseGoal } = req.body;
-  if (!userId || !salary || !minimumExpense || !expenseGoal) {
-    let error = new Error();
-    error.code = "Missing_Required_Fields";
-    throw error;
-  }
   await db.query(INSERT_USER_PROFILE, [userId, salary, minimumExpense, expenseGoal]);
-  res.status(200).end();
+  return res.status(200).json({ message: "Profile created successfully" });
 }
