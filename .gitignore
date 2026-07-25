@@ -4,3 +4,7 @@ ca.pem
 *.txt
 *.tar.gz
 *.log
+*.json
+!package.json
+!package-lock.json
+!jsconfig.json
