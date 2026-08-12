@@ -5,6 +5,7 @@ import userRouter from "./routes/user.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
 import cookieParser from "cookie-parser";
 import express from "express";
+import db from "./db/database.connect.js";
 
 const app = express();
 
