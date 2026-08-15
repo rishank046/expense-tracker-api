@@ -74,6 +74,6 @@ export default function (error, res) {
   } else {
     console.error("Unhandled Error:", error);
     res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    res.end(JSON.stringify({ error: "Internal Server Error" , message : error }));
   }
 }
