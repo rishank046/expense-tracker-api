@@ -33,7 +33,7 @@ export async function getExpense(req, res, next) {
     throw error;
   }
 
-  const [rows] = await db.query(GET_EXPENSE, [userId]);
+  const { rows } = await db.query(GET_EXPENSE, [userId]);
   return res.status(200).json(rows);
 }
 
@@ -89,7 +89,7 @@ export async function getSummary(req, res, next) {
     throw error;
   }
 
-  const [summary] = await db.query(GET_SUMMARY, [userId, startDate, endDate]);
+  const { rows: summary } = await db.query(GET_SUMMARY, [userId, startDate, endDate]);
   return res.status(200).json(summary[0] || { startDate: null, endDate: null, totalExpense: 0 });
 }
 
@@ -103,6 +103,6 @@ export async function filterAmount(req, res, next) {
     throw error;
   }
 
-  const [filteredResponse] = await db.query(FILTER_AMOUNT, [amount, userId]);
+  const { rows: filteredResponse } = await db.query(FILTER_AMOUNT, [amount, userId]);
   return res.status(200).json(filteredResponse);
 }

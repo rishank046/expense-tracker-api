@@ -31,6 +31,12 @@ const init = async () => {
     `);
 
     await db.query(`
+      INSERT INTO Category (name)
+      VALUES ('Food'), ('Transport'), ('Utilities'), ('Entertainment'), ('Health'), ('Shopping'), ('General')
+      ON CONFLICT (name) DO NOTHING;
+    `);
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS Token (
         token VARCHAR(255) PRIMARY KEY,
         userId INTEGER NOT NULL UNIQUE,

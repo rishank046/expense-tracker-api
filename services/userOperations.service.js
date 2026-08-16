@@ -27,7 +27,7 @@ export async function userLogIn(req, res, next) {
     throw error;
   }
 
-  const [users] = await db.query(GET_USER, [email]);
+  const { rows: users } = await db.query(GET_USER, [email]);
   if (!users || users.length === 0) {
     let error = new Error();
     error.code = "No_User_Found";
@@ -35,17 +35,19 @@ export async function userLogIn(req, res, next) {
   }
 
   const user = users[0];
-  const isMatch = await bcrypt.compare(password, user.userPassword);
+  const userPasswordHash = user.userPassword || user.userpassword;
+  const isMatch = await bcrypt.compare(password, userPasswordHash);
   if (!isMatch) {
     let error = new Error();
     error.code = "Missing_Required_Fields";
     throw error;
   }
 
-  const [tokenRows] = await db.query(GET_USER_TOKEN, [user.userId]);
+  const userId = user.userId ?? user.userid;
+  const { rows: tokenRows } = await db.query(GET_USER_TOKEN, [userId]);
   let activeToken = tokenRows[0];
 
-  if (activeToken && activeToken.hours_elapsed < 24) {
+  if (activeToken && Number(activeToken.hours_elapsed) < 24) {
     res.cookie("token", activeToken.token, COOKIE_OPTIONS);
     return res.status(200).json({ message: "Login successful", token: activeToken.token });
   }
@@ -55,7 +57,7 @@ export async function userLogIn(req, res, next) {
   }
 
   const newToken = crypto.randomBytes(32).toString("hex");
-  await db.query(ADD_LOGIN_TOKEN, [newToken, user.userId]);
+  await db.query(ADD_LOGIN_TOKEN, [newToken, userId]);
 
   res.cookie("token", newToken, COOKIE_OPTIONS);
   return res.status(200).json({ message: "Login successful", token: newToken });

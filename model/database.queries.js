@@ -1,11 +1,11 @@
 export const CREATE_USER =
-  "INSERT INTO User (userName, userEmail, userPassword) VALUES ($1, $2, $3)";
+  'INSERT INTO "User" (userName, userEmail, userPassword) VALUES ($1, $2, $3)';
 
 export const GET_USER =
-  "SELECT * FROM User WHERE userEmail = $1";
+  'SELECT userId AS "userId", userName AS "userName", userEmail AS "userEmail", userPassword AS "userPassword" FROM "User" WHERE userEmail = $1';
 
 export const CHECK_USER_CREATED =
-  "SELECT userId FROM User WHERE userEmail = $1";
+  'SELECT userId AS "userId" FROM "User" WHERE userEmail = $1';
 
 export const ADD_EXPENSE =
   "INSERT INTO Expenses (category_id, userId, amount, description) VALUES ($1, $2, $3, $4)";
@@ -15,8 +15,8 @@ export const DELETE_EXPENSE =
 
 export const GET_EXPENSE = `
   SELECT 
-    e.expense_id AS expenseId,
-    c.name AS categoryName,
+    e.expense_id AS "expenseId",
+    c.name AS "categoryName",
     e.amount,
     e.description,
     e.created_at
@@ -41,6 +41,7 @@ export const ADD_LOGIN_TOKEN =
 export const GET_USER_TOKEN = `
   SELECT 
     token,
+    userId AS "userId",
     EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - created_at)) / 3600 AS hours_elapsed
   FROM Token
   WHERE userId = $1
@@ -48,9 +49,9 @@ export const GET_USER_TOKEN = `
 
 export const GET_SUMMARY = `
   SELECT 
-    MIN(created_at) AS startDate,
-    MAX(created_at) AS endDate,
-    COALESCE(SUM(amount), 0) AS totalExpense
+    MIN(created_at) AS "startDate",
+    MAX(created_at) AS "endDate",
+    COALESCE(SUM(amount), 0)::INT AS "totalExpense"
   FROM Expenses
   WHERE userId = $1
     AND created_at >= $2
@@ -61,6 +62,11 @@ export const INSERT_USER_PROFILE = `
   INSERT INTO userProfile 
     (userId, salary, minimum_expense, expense_goal)
   VALUES ($1, $2, $3, $4)
+  ON CONFLICT (userId)
+  DO UPDATE SET
+    salary = EXCLUDED.salary,
+    minimum_expense = EXCLUDED.minimum_expense,
+    expense_goal = EXCLUDED.expense_goal
 `;
 
 export const DELETE_TOKEN = `
@@ -68,7 +74,11 @@ export const DELETE_TOKEN = `
 `;
 
 export const FILTER_AMOUNT = `
-  SELECT amount, description, created_at
+  SELECT 
+    expense_id AS "expenseId",
+    amount, 
+    description, 
+    created_at
   FROM Expenses
   WHERE amount <= $1
     AND userId = $2
@@ -76,7 +86,7 @@ export const FILTER_AMOUNT = `
 `;
 
 export const GET_USER_ID_BY_TOKEN = `
-  SELECT userId
+  SELECT userId AS "userId"
   FROM Token
   WHERE token = $1
 `;

@@ -62,6 +62,18 @@ export default function (error, res) {
       message: "Required field is missing",
       statusCode: 400,
     },
+    42601: {
+      message: "Database syntax error",
+      statusCode: 500,
+    },
+    42703: {
+      message: "Database column error",
+      statusCode: 500,
+    },
+    "42P01": {
+      message: "Database relation error",
+      statusCode: 500,
+    },
   };
 
   res.setHeader("Content-Type", "application/json");
@@ -74,6 +86,6 @@ export default function (error, res) {
   } else {
     console.error("Unhandled Error:", error);
     res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" , message : error }));
+    res.end(JSON.stringify({ error: "Internal Server Error", message: error?.message || "An unexpected error occurred" }));
   }
 }
