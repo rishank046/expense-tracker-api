@@ -10,7 +10,7 @@ const db = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 
-  max: 10,
+  max: 1000,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
 });
