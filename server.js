@@ -45,6 +45,9 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
+app.get("/health" , (req , res) => {
+  res.json({status : "Works"});
+})
 app.use("/user", userRouter);
 app.use("/expense", expenseRouter);
 
